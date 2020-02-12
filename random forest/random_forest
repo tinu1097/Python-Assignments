@@ -1,0 +1,57 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+fraud_data = pd.read_csv("C:\\Users\\Hp\\Downloads\\DATA SCIENCE ASSIGNMENTS\\Decision tree assignments\\Fraud_check (1).csv")
+fraud_data.head()
+fraud_data.dtypes
+fraud_data.shape
+fraud_data["Work.Experience"].mean()
+fraud_data["Work.Experience"].median()
+####################
+fraud_data['Tax'] = np.where((fraud_data['Taxable.Income']<=30000),'Risky','Good')
+###########################
+from sklearn import preprocessing
+label_encoder = preprocessing.LabelEncoder()
+fraud_data['Tax'] = label_encoder.fit_transform(fraud_data['Tax'])
+fraud_data['Marital.Status'] = label_encoder.fit_transform(fraud_data['Marital.Status'])
+fraud_data['Undergrad'] = label_encoder.fit_transform(fraud_data['Undergrad'])
+fraud_data['Urban'] = label_encoder.fit_transform(fraud_data['Urban'])
+
+list_col =  ["Tax","Urban","Marital.Status","Undergrad"]
+for i in list_col:
+fraud_data[i] = fraud_data[i].astype(object)
+fraud_data.dtypes
+fraud_data["Tax"] = fraud_data["Tax"].astype("int64")
+fraud_data = fraud_data.drop(["Taxable.Income"],axis=1)
+#col_names = list(fraud_data.columns)
+#inputs = fraud_data.iloc[:,0:5]
+###spliting data ##
+from sklearn.model_selection import train_test_split
+fraud_train,fraud_test = train_test_split(fraud_data,test_size=0.3)
+fraud_input = pd.DataFrame(fraud_train.iloc[:,0:5])
+fraud_output = pd.DataFrame(fraud_train.iloc[:,5])
+fraud_train.shape
+fraud_predict = pd.DataFrame(fraud_test.iloc[:,0:5])
+fraud_traget = pd.DataFrame(fraud_test.iloc[:,5])
+fraud_test.shape
+
+from sklearn.ensemble import RandomForestClassifier
+fraud_RF = RandomForestClassifier(n_jobs=3,oob_score=True,n_estimators=15,criterion="entropy")
+fraud_RF.fit(fraud_input,fraud_output)
+
+# Training Accuracy
+fraud_input["rf_pred"] = fraud_RF.predict(fraud_input)
+from sklearn.metrics import confusion_matrix
+confusion_matrix(fraud_output,fraud_input["rf_pred"])
+# Accuracy
+print ("Accuracy",(321+97)/(321+97+0+2)) # 99
+fraud_train.append("rf_pred")
+
+fraud_predict["rf_pred1"] = fraud_RF.predict(fraud_predict)
+from sklearn.metrics import confusion_matrix
+confusion_matrix(fraud_traget,fraud_predict["rf_pred1"])
+# Accuracy
+print ("Accuracy",(129+3)/(129+22+3+26)) # 73
+
+
+

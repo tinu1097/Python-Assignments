@@ -1,0 +1,6 @@
+sales  = np.array(company.Sales)
+for i in sales:
+    if (i>9.5):
+        print("Yes")
+    else:
+        print("No")

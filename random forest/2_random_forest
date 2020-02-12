@@ -1,0 +1,86 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+fraud_data = pd.read_csv("C:\\Users\\Hp\\Downloads\\DATA SCIENCE ASSIGNMENTS\\Decision tree assignments\\Fraud_check (1).csv")
+fraud_data.head()
+fraud_data.dtypes
+fraud_data.shape
+fraud_data["Work.Experience"].mean()
+fraud_data["Work.Experience"].median()
+
+fraud_data['Tax'] = np.where((fraud_data['Taxable.Income']<=30000),'Risky','Good')
+###########################
+from sklearn import preprocessing
+label_encoder = preprocessing.LabelEncoder()
+fraud_data['Tax'] = label_encoder.fit_transform(fraud_data['Tax'])
+fraud_data['Marital.Status'] = label_encoder.fit_transform(fraud_data['Marital.Status'])
+fraud_data['Undergrad'] = label_encoder.fit_transform(fraud_data['Undergrad'])
+fraud_data['Urban'] = label_encoder.fit_transform(fraud_data['Urban'])
+
+list_col =  ["Tax","Urban","Marital.Status","Undergrad"]
+for i in list_col:
+fraud_data[i] = fraud_data[i].astype(object)
+
+fraud_data.dtypes
+fraud_data["Tax"] = fraud_data["Tax"].astype("int64")
+
+fraud_data = fraud_data.drop(["Taxable.Income"],axis=1)
+colnames = list(fraud_data.columns)
+prdictors = colnames[:5]
+target = colnames[5]
+
+x = fraud_data[prdictors]
+y = fraud_data[target]
+
+
+from sklearn.ensemble import RandomForestClassifier
+rf = RandomForestClassifier(n_jobs=3,oob_score=True,n_estimators=15,criterion="entropy")
+
+
+rf.fit(x,y) # Fitting RandomForestClassifier model from sklear00n.ensemble
+rf.estimators_ #
+rf.classes_ # class labels (output)
+rf.n_classes_ # Number of levels in class labels
+rf.n_features_  # Number of input features in model 8 here.
+
+rf.n_outputs_ # Number of outputs when fit performed
+
+rf.oob_score_  # 0.728
+rf.predict(x)
+
+fraud_data['rf_pred'] = rf.predict(x)
+cols = ['rf_pred','Tax']
+fraud_data[cols].head()
+
+
+from sklearn.metrics import confusion_matrix
+confusion_matrix(fraud_data['Tax'],fraud_data['rf_pred']) # Confusion matrix
+
+pd.crosstab(fraud_data['Tax'],fraud_data['rf_pred'])
+
+print("Accuracy",(476+117)/(476+7+0+117)*100) ###98.3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

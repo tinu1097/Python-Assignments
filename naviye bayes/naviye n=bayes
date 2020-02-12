@@ -1,0 +1,114 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sb
+clamints = pd.read_csv("C:\\Users\\Hp\\Downloads\\pythone practice\\logistic regression\\claimants.csv")
+clamints.shape
+clamints.columns
+clamints.drop(["CASENUM"],inplace =True,axis=1)
+clamints.dtypes
+clamints.isnull().sum()
+#######plotting####
+sb.boxplot(x="ATTORNEY",y="CLMAGE",data=clamints,palette="hls")
+plt.show()
+sb.boxplot(x="ATTORNEY",y="LOSS",data=clamints,palette="hls")
+plt.show()
+sb.boxplot(x="CLMSEX",y="CLMAGE",data=clamints,palette="hls")
+plt.show()
+sb.boxplot(x="CLMSEX",y="LOSS",data=clamints,palette="hls")
+plt.show()
+sb.boxplot(x="SEATBELT",y="CLMAGE",data=clamints,palette="hls")
+plt.show()
+
+
+import statistics
+clamints['CLMSEX'].mode()
+clamints['CLMINSUR'].mode()
+clamints['SEATBELT'].mode()
+clamints.CLMAGE.median()
+
+clamints["CLMSEX"].fillna(1,inplace=True)
+clamints["CLMINSUR"].fillna(1,inplace=True)
+clamints["SEATBELT"].fillna(0,inplace=True)
+clamints["CLMAGE"].fillna(30,inplace=True)
+clamints.isnull().sum()
+##convert into object##
+list = ['CLMSEX','CLMINSUR','SEATBELT']
+for i in list:
+   clamints[i] = clamints[i].astype(object)
+clamints.dtypes
+
+from sklearn import preprocessing
+label_encoder = preprocessing.LabelEncoder()
+clamints['ATTORNEY'].unique()
+# Encode labels in column
+clamints['ATTORNEY']= label_encoder.fit_transform(clamints['ATTORNEY'])
+clamints['ATTORNEY'].unique()
+#clamints['ATTORNEY']= clamints['ATTORNEY'].astype(object)
+##################################################
+clamints['CLMINSUR'].unique()
+# Encode labels in column
+clamints['CLMINSUR']= label_encoder.fit_transform(clamints['CLMINSUR'])
+clamints['CLMINSUR'].unique()
+clamints['CLMINSUR']= clamints['CLMINSUR'].astype(object)
+###################################################
+clamints['CLMSEX'].unique()
+# Encode labels in column
+clamints['CLMSEX']= label_encoder.fit_transform(clamints['CLMSEX'])
+clamints['CLMSEX'].unique()
+clamints['CLMSEX']= clamints['CLMSEX'].astype(object)
+##############################################
+clamints['SEATBELT'].unique()
+# Encode labels in column
+clamints['SEATBELT']= label_encoder.fit_transform(clamints['SEATBELT'])
+clamints['SEATBELT'].unique()
+clamints['SEATBELT']= clamints['SEATBELT'].astype(object)
+
+clamints['CLMAGE'].unique()
+# Encode labels in column
+clamints['CLMAGE']= label_encoder.fit_transform(clamints['CLMAGE'])
+clamints['CLMAGE'].unique()
+
+clamints['LOSS'].unique()
+# Encode labels in column
+clamints['LOSS']= label_encoder.fit_transform(clamints['LOSS'])
+clamints['LOSS'].unique()
+
+clamints.shape
+clamints.dtypes
+#train = clamints.iloc[:,[1,2,3,4,5]]
+#test = clamints.iloc[:,0]
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+from sklearn.naive_bayes import GaussianNB ##for numeric data but gives lesser accuracy
+from sklearn.naive_bayes import MultinomialNB ##for text data gives higher accuracy
+
+inputs = ["CLMSEX", "CLMINSUR", "SEATBELT", "CLMAGE", "LOSS"]
+output = ["ATTORNEY"]
+
+xtrain,xtest,ytrain,ytest =train_test_split (clamints[inputs],clamints[output],test_size=0.3, random_state=0)
+gb = GaussianNB()
+mn = MultinomialNB()
+
+cl_gb  = gb.fit(xtrain,ytrain).predict(xtest)
+cl_mn = mn.fit(xtrain,ytrain).predict(xtest)
+
+# Confusion matrix
+pd.crosstab(ytest.values.flatten(),cl_gb)
+np.mean(cl_gb==ytest.values.flatten()) ##0.63
+confusion_matrix(ytest,cl_gb)
+print ("Accuracy",(113+141)/(113+141+37+111)) # 0.63
+################################
+pd.crosstab(ytest.values.flatten(),cl_mn)
+np.mean(cl_mn==ytest.values.flatten()) ##0.69
+confusion_matrix(ytest,cl_mn)
+print ("Accuracy",(160+118)/(160+64+60+118)) # 0.69
+
+
+
+
+
+
+
+
+

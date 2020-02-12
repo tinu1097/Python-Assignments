@@ -1,0 +1,130 @@
+###all required packages##
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.cluster.hierarchy import linkage
+import scipy.cluster.hierarchy as sch
+
+airline = pd.read_csv("C:\\Users\\Hp\\Downloads\\pythone practice\\clustering\\airlines.csv")
+airline.dtypes
+airline = airline.drop(['ID#'],axis=1)
+airline.columns.values
+airline.shape
+
+# Normalization function
+def norm_func(i):
+  x = (i-i.min())	/	(i.max()	-	i.min())
+   return (x)
+
+# Normalized data frame (considering the numerical part of data)
+df_norm = norm_func(airline.iloc[:,0:11])
+type(df_norm)
+#import libraries for hierarchy clustering#
+from scipy.cluster.hierarchy import linkage
+from scipy.cluster.hierarchy as sch
+
+#p = np.array(df_norm) # converting into numpy array format
+help(linkage)
+z = linkage(df_norm, method="complete",metric="euclidean")
+z1 = linkage (df_norm,method="average",metric="euclidean")
+#method we can use average,complete,'weighted' and 'ward',median
+
+##plotting##
+plt.figure(figsize=(15,5));plt.title('Hierarchical Cluatering Dendrogram');plt.xlabel('Index');plt.ylabel('Distance')
+sch.dendrogram(
+    z,
+    leaf_rotation=0.,  # rotates the x axis labels
+    leaf_font_size=8., # font size for the x axis labels
+)
+plt.show()
+
+##by average method
+plt.figure(figsize=(15,5));plt.title('Hierarchical Cluatering Dendrogram');plt.xlabel('Index');plt.ylabel('Distance')
+sch.dendrogram(
+    z1,
+    leaf_rotation=0.,  # rotates the x axis labels
+    leaf_font_size=8., # font size for the x axis labels
+)
+plt.show()
+
+from sklearn.cluster import AgglomerativeClustering
+
+h_complete	=	AgglomerativeClustering(n_clusters=5,	linkage='complete',affinity = "euclidean").fit(df_norm)
+h_complete.labels_
+h_complete.fit(df_norm)
+
+cluster_labels=pd.Series(h_complete.labels_)
+airline['clust'] = cluster_labels
+airline.shape
+
+airline = airline.iloc[:,[11,0,1,2,3,4,5,6,7,8,9,10]]
+airline.head()
+
+airline.groupby(airline.clust).mean()
+air_result = airline.groupby(airline.clust).mean()
+
+####create csv##
+airline.to_csv("airline.csv",encoding="utf-8")
+import os
+os.getcwd()
+########################K-means clustering##########
+from sklearn.cluster import KMeans
+from scipy.spatial.distance import cdist
+
+
+###### screw plot or elbow curve ############
+k = list(range(3,15))
+k
+TWSS = [] # variable for storing total within sum of squares for each kmeans
+for i in k:
+    kmeans = KMeans(n_clusters = i)
+    kmeans.fit(df_norm)
+    WSS = [] # variable for storing within sum of squares for each cluster
+    for j in range(i):
+        WSS.append(sum(cdist(df_norm.iloc[kmeans.labels_==j,:],kmeans.cluster_centers_[j].reshape(1,df_norm.shape[1]),"euclidean")))
+    TWSS.append(sum(WSS))
+
+TWSS_cluster = pd.DataFrame(columns = ["TWSS", "NO OF CLUSTERS"])
+TWSS_cluster.TWSS = pd.Series(TWSS)
+TWSS_cluster["NO OF CLUSTERS"]=pd.Series(k)
+   # Scree plot
+plt.plot(k,TWSS, 'ro-');plt.xlabel("No_of_Clusters");plt.ylabel("total_within_SS");plt.xticks(k)
+plt.show()
+# Selecting 5 clusters from the above scree plot which is the optimum number of clusters
+model=KMeans(n_clusters=5)
+model.fit(df_norm)
+
+model.labels_ # getting the labels of clusters assigned to each row
+n_clust=pd.Series(model.labels_)  # converting numpy array into pandas series object
+airline['n_clust']=n_clust
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
